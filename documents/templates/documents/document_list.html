@@ -1,0 +1,131 @@
+
+{% extends "documents/base.html" %}
+
+{% block title %}{% if show_archived %}Archived Documents{% else %}Documents{% endif %} | LUANAR{% endblock %}
+
+{% block content %}
+
+<div class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-900">
+            {% if show_archived %}Archived Documents{% else %}Documents{% endif %}
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">
+            {% if show_archived %}
+                Browse and restore archived university documents.
+            {% else %}
+                Browse and access university documents.
+            {% endif %}
+        </p>
+    </div>
+
+    <a href="{% url 'documents:document_upload' %}"
+       class="inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium text-white bg-blue-700 rounded-lg hover:bg-blue-800">
+        Upload document
+    </a>
+</div>
+
+<section class="rounded-lg border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+
+    <form method="GET" class="mb-6 flex flex-col gap-3 md:flex-row">
+
+        <input
+            type="search"
+            name="q"
+            value="{{ search }}"
+            placeholder="Search documents..."
+            class="block w-full flex-1 rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500"
+        >
+
+        <select
+            name="category"
+            class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500 md:w-auto"
+        >
+            <option value="">All categories</option>
+
+            {% for category in categories %}
+                <option value="{{ category.id }}"
+                    {% if selected_category == category.id|stringformat:"s" %}
+                        selected
+                    {% endif %}
+                >
+                    {{ category.name }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <button
+            type="submit"
+            class="rounded-lg bg-blue-700 px-5 py-2.5 text-sm font-medium text-white hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300"
+        >
+            Search
+        </button>
+
+    </form>
+
+    <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-gray-500">
+
+            <thead class="bg-gray-50 text-xs uppercase text-gray-700">
+                <tr>
+                    <th class="px-6 py-3">Document</th>
+                    <th class="px-6 py-3">Category</th>
+                    <th class="px-6 py-3">Uploaded by</th>
+                    <th class="px-6 py-3">Date added</th>
+                    <th class="px-6 py-3">Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for document in documents %}
+                    <tr class="border-b bg-white hover:bg-gray-50">
+
+                        <td class="whitespace-nowrap px-6 py-4 font-medium text-gray-900">
+                            {{ document.title }}
+                        </td>
+
+                        <td class="px-6 py-4">
+                            {% for category in document.categories.all %}
+                                <span class="mb-1 inline-block rounded bg-blue-100 px-2 py-1 text-xs font-medium text-blue-800">
+                                    {{ category.name }}
+                                </span>
+                            {% empty %}
+                                <span class="text-gray-500">Uncategorised</span>
+                            {% endfor %}
+                        </td>
+
+                        <td class="px-6 py-4">
+                            {{ document.uploaded_by }}
+                        </td>
+
+                        <td class="px-6 py-4">
+                            {{ document.created_at|date:"d M Y" }}
+                        </td>
+
+                        <td class="px-6 py-4">
+                            <a href="{% url 'documents:document_detail' document.id %}"
+                                class="font-medium text-blue-700 hover:underline">
+                                    View details
+                            </a>
+                        </td>
+
+                    </tr>
+
+                {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center">
+                                            <p class="mb-1 text-base font-semibold text-gray-900">
+                                                {% if show_archived %}No archived documents found{% else %}No documents found{% endif %}
+                                            </p>
+                            <p class="text-sm text-gray-500">Try changing your search or category filter.</p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </section>
+
+</div>
+
+{% endblock %}

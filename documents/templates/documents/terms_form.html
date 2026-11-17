@@ -1,0 +1,77 @@
+
+{% extends "documents/base.html" %}
+
+{% block content %}
+
+<div class="max-w-4xl mx-auto p-4 sm:p-6">
+
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">
+            {{ page_title }}
+        </h1>
+
+        <p class="text-sm text-gray-500 mt-1">
+            Create or update a draft document access agreement.
+        </p>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="mb-5">
+
+                    <label
+                        for="{{ field.id_for_label }}"
+                        class="block mb-2 text-sm font-medium text-gray-900"
+                    >
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <p class="mt-1 text-xs text-gray-500">
+                            {{ field.help_text }}
+                        </p>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <p class="mt-1 text-sm text-red-600">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+
+                </div>
+            {% endfor %}
+
+            <div class="flex flex-wrap gap-3 mt-6">
+
+                <button
+                    type="submit"
+                    class="px-5 py-2.5 text-sm font-medium text-white
+                           bg-blue-700 rounded-lg hover:bg-blue-800"
+                >
+                    Save Draft
+                </button>
+
+                <a
+                    href="{% url 'documents:terms_management' %}"
+                    class="px-5 py-2.5 text-sm font-medium text-gray-900
+                           bg-white border border-gray-300 rounded-lg
+                           hover:bg-gray-100"
+                >
+                    Cancel
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

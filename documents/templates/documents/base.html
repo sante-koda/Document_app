@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LUANAR Document Management{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-900 antialiased">
+    {% block sidebar %}
+    {% if request.user.is_authenticated %}
+        <button
+            data-drawer-target="document-sidebar"
+            data-drawer-toggle="document-sidebar"
+            aria-controls="document-sidebar"
+            type="button"
+            class="m-3 inline-flex items-center rounded-lg border border-gray-300 bg-white p-2 text-sm text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 sm:hidden"
+        >
+            <span class="sr-only">Open sidebar</span>
+            <svg class="h-6 w-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M5 7h14M5 12h14M5 17h14"/>
+            </svg>
+        </button>
+
+        <aside
+            id="document-sidebar"
+            class="fixed left-0 top-0 z-40 h-screen w-64 -translate-x-full border-r border-gray-200 bg-white transition-transform sm:translate-x-0"
+            aria-label="Sidebar"
+        >
+            <div class="flex h-full flex-col overflow-y-auto px-3 py-4">
+                <a href="{% url 'documents:document_list' %}" class="mb-6 flex items-center px-2.5">
+                    <span class="text-xl font-bold text-blue-800">LUANAR Documents</span>
+                </a>
+                <ul class="flex-1 space-y-2 font-medium">
+                    <li>
+                        <a href="{% url 'documents:document_list' %}" class="flex items-center rounded-lg px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-800">
+                            <svg class="h-5 w-5 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 0 1 1-1h5l2 2h7a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5Z"/>
+                            </svg>
+                            <span class="ms-3">Documents</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'documents:document_upload' %}" class="flex items-center rounded-lg px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-800">
+                            <svg class="h-5 w-5 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v14m-7-7h14"/>
+                            </svg>
+                            <span class="ms-3">Upload document</span>
+                        </a>
+                    </li>
+                    
+            {% if request.user.is_staff %}
+
+                <li class="px-3 pt-5 pb-2">
+                    <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                        Administration
+                    </span>
+                </li>
+
+                <li>
+                    <a href="{% url 'documents:activity_history' %}"
+                    class="flex items-center rounded-lg px-3 py-2 {% if request.resolver_match.url_name == 'activity_history' %}bg-blue-100 text-blue-800{% else %}text-gray-700 hover:bg-blue-50 hover:text-blue-800{% endif %}">
+                        <span class="ms-3">Activity history</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'documents:terms_management' %}"
+                    class="flex items-center rounded-lg px-3 py-2 {% if request.resolver_match.url_name in 'terms_management terms_create terms_edit terms_publish' %}bg-blue-100 text-blue-800{% else %}text-gray-700 hover:bg-blue-50 hover:text-blue-800{% endif %}">
+                        <span class="ms-3">Terms &amp; Conditions</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'documents:terms_acceptance_records' %}"
+                    class="flex items-center rounded-lg px-3 py-2 {% if request.resolver_match.url_name == 'terms_acceptance_records' %}bg-blue-100 text-blue-800{% else %}text-gray-700 hover:bg-blue-50 hover:text-blue-800{% endif %}">
+                        <span class="ms-3">Acceptance Records</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a href="{% url 'documents:document_list' %}?archived=1"
+                    class="flex items-center rounded-lg px-3 py-2 {% if request.GET.archived == '1' %}bg-blue-100 text-blue-800{% else %}text-gray-700 hover:bg-blue-50 hover:text-blue-800{% endif %}">
+                        <span class="ms-3">Archived documents</span>
+                    </a>
+                </li>
+
+            {% endif %}
+
+                </ul>
+
+                <div class="border-t border-gray-200 pt-4">
+                    <p class="mb-3 truncate px-3 text-sm text-gray-600">
+                        {{ request.user.get_full_name|default:request.user.username }}
+                    </p>
+                    <form method="post" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="flex w-full items-center rounded-lg px-3 py-2 text-left text-sm font-medium text-blue-700 hover:bg-blue-50">
+                            <svg class="h-5 w-5 shrink-0" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 17l5-5-5-5m5 5H3m9-9h6a3 3 0 0 1 3 3v12a3 3 0 0 1-3 3h-6"/>
+                            </svg>
+                            <span class="ms-3">Log out</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </aside>
+    {% endif %}
+    {% endblock %}
+
+    <main class="page-enter min-h-screen p-4 sm:p-8{% block main_offset %}{% if request.user.is_authenticated %} sm:ml-64{% endif %}{% endblock %}">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <script src="{% static 'js/flowbite.min.js' %}"></script>
+</body>
+</html>
